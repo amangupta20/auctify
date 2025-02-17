@@ -13,15 +13,34 @@ const Page = () => {
           <p className="text-xl mb-8 max-w-2xl mx-auto text-gray-100">
             Your premier destination for online auctions. Discover unique items and bid with confidence.
           </p>
-          <Link 
-            href="/auction/create" 
-            className="inline-flex items-center bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
-          >
-            Start Auctioning
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-            </svg>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link 
+              href="/login" 
+              className="inline-flex items-center bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
+            >
+              Login
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </Link>
+            <Link 
+              href="/signup" 
+              className="inline-flex items-center bg-indigo-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all border border-indigo-700"
+            >
+              Sign Up
+            </Link>
+          </div>
+          <div className="mt-8">
+            <Link 
+              href="/auction/create" 
+              className="inline-flex items-center bg-transparent text-white px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-all border border-white"
+            >
+              Start Auctioning
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </Link>
+          </div>
         </div>
       </section>
 
