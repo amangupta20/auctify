@@ -144,10 +144,10 @@ export default async function AuctionPage({ params }: PageProps) {
                     </Link>
                   </div>
                   <div className="mt-2 flex items-center space-x-4">
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100">
+                    <span className="px-3 py-1 rounded-fulltext-indigo-600 text-xs font-medium bg-gray-100">
                       {auction.category}
                     </span>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100">
+                    <span className="px-3 py-1 rounded-full text-indigo-600 text-xs font-medium bg-gray-100">
                       {auction.condition}
                     </span>
                   </div>
