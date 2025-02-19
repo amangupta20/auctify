@@ -25,7 +25,13 @@ const conditions = [
   'For Parts'
 ] as const;
 
-export default function CreateAuctionForm({ createAuction }: { createAuction: (formData: FormData) => Promise<void> }) {
+interface CreateAuctionResponse {
+  error?: string;
+  success?: boolean;
+  auctionId?: string;
+}
+
+export default function CreateAuctionForm({ createAuction }: { createAuction: (formData: FormData) => Promise<CreateAuctionResponse> }) {
   const router = useRouter();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,9 +50,16 @@ export default function CreateAuctionForm({ createAuction }: { createAuction: (f
     setError(null);
     
     try {
-      await createAuction(formData);
+      const response = await createAuction(formData);
+      if (response.error) {
+        setError(response.error);
+        setIsSubmitting(false);
+      } else if (response.success && response.auctionId) {
+        router.push(`/auction/${response.auctionId}`);
+      }
     } catch (err) {
-      setError('An error occurred while creating the auction. Please try again.');
+      console.error('Form submission error:', err);
+      setError('An unexpected error occurred. Please try again.');
       setIsSubmitting(false);
     }
   }
@@ -62,7 +75,8 @@ export default function CreateAuctionForm({ createAuction }: { createAuction: (f
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-red-800">{error}</p>
+              <h3 className="text-sm font-medium text-red-800">Error Creating Auction</h3>
+              <p className="mt-1 text-sm text-red-700">{error}</p>
             </div>
           </div>
         </div>
