@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 import Link from 'next/link';
+import DeleteAuctionButton from './DeleteAuctionButton';
 
 interface ExtendedBid {
   id: string;
@@ -201,6 +202,10 @@ export default async function AuctionPage(props: PageProps) {
                         </button>
                       </div>
                     </form>
+                  )}
+
+                  {isOwner && !isEnded && (
+                    <DeleteAuctionButton auctionId={auction.id} />
                   )}
 
                   {isEnded && (
