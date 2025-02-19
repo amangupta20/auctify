@@ -4,11 +4,12 @@ import { auth, signIn } from "@/auth"
 import { redirect } from "next/navigation"
 import { AuthError } from 'next-auth';
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: { error?: string; message?: string };
-}) {
+export default async function LoginPage(
+  props: {
+    searchParams: Promise<{ error?: string; message?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await auth();
   if (session?.user) {
     redirect("/");

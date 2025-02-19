@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 
 interface PageProps {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }
 
 const getErrorMessage = (error: string) => {
@@ -14,7 +14,8 @@ const getErrorMessage = (error: string) => {
   }
 };
 
-export default function AuthErrorPage({ searchParams }: PageProps) {
+export default async function AuthErrorPage(props: PageProps) {
+  const searchParams = await props.searchParams;
   const errorMessage = getErrorMessage(searchParams.error || '');
 
   return (

@@ -15,7 +15,7 @@ interface ExtendedBid {
 }
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function placeBid(formData: FormData) {
@@ -77,7 +77,8 @@ async function placeBid(formData: FormData) {
   redirect(`/auction/${auctionId}`);
 }
 
-export default async function AuctionPage({ params }: PageProps) {
+export default async function AuctionPage(props: PageProps) {
+  const params = await props.params;
   try {
     const session = await auth();
     const { id } = params;
