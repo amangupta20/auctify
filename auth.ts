@@ -1,5 +1,4 @@
 import NextAuth from "next-auth"
-import GitHub from "next-auth/providers/github"
 import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client"
@@ -14,7 +13,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         error: '/auth/error'
     },
     providers: [
-        GitHub,
         Credentials({
             name: "credentials",
             credentials: {
@@ -27,7 +25,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 }
 
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email }
+                    where: { 
+                        email: credentials.email as string 
+                    }
                 })
 
                 if (!user || !user.password) {
@@ -49,41 +49,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
         })
     ],
-    callbacks: {
-        async signIn({ user, account }) {
-            if (!user.email) {
-                return false
-            }
-
-            // Allow credential login to pass through
-            if (account?.provider === "credentials") {
-                return true
-            }
-
-            // Check if user exists with this email
-            const existingUser = await prisma.user.findUnique({
-                where: { email: user.email },
-                include: { accounts: true }
-            })
-
-            // If no user exists, allow sign in
-            if (!existingUser) {
-                return true
-            }
-
-            // If user exists and has the same provider, allow sign in
-            if (existingUser.accounts.some(acc => acc.provider === account?.provider)) {
-                return true
-            }
-
-            // If user exists but with different provider, redirect to link accounts page
-            if (account?.provider) {
-                return `/auth/link-account?email=${encodeURIComponent(user.email)}&provider=${account.provider}`
-            }
-
-            return false
-        }
-    },
     session: {
         strategy: "jwt"
     }

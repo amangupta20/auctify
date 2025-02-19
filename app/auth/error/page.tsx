@@ -7,8 +7,6 @@ interface PageProps {
 
 const getErrorMessage = (error: string) => {
   switch (error) {
-    case 'OAuthAccountNotLinked':
-      return 'This email is already associated with a different sign-in method. Please use your original sign-in method.';
     case 'CredentialsSignin':
       return 'Invalid email or password. Please try again.';
     default:
