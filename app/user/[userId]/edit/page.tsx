@@ -7,7 +7,7 @@ import EditProfileForm from './EditProfileForm';
 const prisma = new PrismaClient();
 
 interface PageProps {
-  params: { userId: string };
+  params: Promise<{ userId: string }>;
 }
 
 interface ExtendedUser extends User {
@@ -35,7 +35,7 @@ export default async function EditProfilePage(props: PageProps) {
 
     const user = await prisma.user.findUnique({
       where: { 
-        email: decodeURIComponent(props.params.userId)
+        email: decodeURIComponent((await props.params).userId)
       }
     }) as ExtendedUser | null;
 

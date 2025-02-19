@@ -8,7 +8,7 @@ import Link from 'next/link';
 const prisma = new PrismaClient();
 
 interface PageProps {
-  params: { userId: string };
+  params: Promise<{ userId: string }>;
 }
 
 interface ExtendedUser extends User {
@@ -23,7 +23,7 @@ interface ExtendedUser extends User {
 export async function generateMetadata(props: PageProps) {
   try {
     const user = await prisma.user.findUnique({
-      where: { email: decodeURIComponent(props.params.userId) }
+      where: { email: decodeURIComponent((await props.params).userId) }
     });
 
     return {
@@ -42,7 +42,7 @@ export default async function UserProfilePage(props: PageProps) {
     
     const user = await prisma.user.findUnique({
       where: { 
-        email: decodeURIComponent(props.params.userId)
+        email: decodeURIComponent((await props.params).userId)
       }
     }) as ExtendedUser | null;
 
