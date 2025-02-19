@@ -3,10 +3,21 @@ import Link from 'next/link';
 import { auth, signIn } from "@/auth"
 import { redirect } from "next/navigation"
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: { error?: string; message?: string };
+}) {
   const session = await auth();
   if (session?.user) {
     redirect("/");
+  }
+
+  const error = searchParams?.error;
+
+  let errorMessage = '';
+  if (error === 'CredentialsSignin') {
+    errorMessage = 'Invalid email or password. Please try again.';
   }
 
   return (
@@ -23,10 +34,19 @@ export default async function LoginPage() {
         </div>
         <form className="mt-8 space-y-6" action={async (formData: FormData) => {
           "use server";
+          
+          const email = formData.get("email");
+          const password = formData.get("password");
+
+          if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
+            return;
+          }
+
           await signIn("credentials", {
-            email: formData.get("email"),
-            password: formData.get("password"),
-            redirectTo: "/"
+            email,
+            password,
+            redirectTo: "/",
+            redirect: true,
           });
         }}>
           <div className="rounded-md shadow-sm -space-y-px">
@@ -56,6 +76,23 @@ export default async function LoginPage() {
             </div>
           </div>
 
+          {errorMessage && (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-red-800">
+                    {errorMessage}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div>
             <button
               type="submit"
@@ -63,6 +100,15 @@ export default async function LoginPage() {
             >
               Sign in
             </button>
+          </div>
+
+          <div className="text-center">
+            <Link 
+              href="/forgot-password" 
+              className="text-sm text-indigo-600 hover:text-indigo-500"
+            >
+              Forgot your password?
+            </Link>
           </div>
         </form>
       </div>

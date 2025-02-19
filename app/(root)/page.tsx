@@ -1,8 +1,14 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { auth } from "@/auth";
+import { PrismaClient } from '@prisma/client';
 
-const Page = () => {
+const prisma = new PrismaClient();
+
+export default async function Page() {
+  const session = await auth();
+  
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -14,32 +20,43 @@ const Page = () => {
             Your premier destination for online auctions. Discover unique items and bid with confidence.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link 
-              href="/login" 
-              className="inline-flex items-center bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
-            >
-              Login
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-              </svg>
-            </Link>
-            <Link 
-              href="/signup" 
-              className="inline-flex items-center bg-indigo-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all border border-indigo-700"
-            >
-              Sign Up
-            </Link>
-          </div>
-          <div className="mt-8">
-            <Link 
-              href="/auction/create" 
-              className="inline-flex items-center bg-transparent text-white px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-all border border-white"
-            >
-              Start Auctioning
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-              </svg>
-            </Link>
+            {!session?.user ? (
+              <>
+                <Link 
+                  href="/login" 
+                  className="inline-flex items-center bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Login
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                  </svg>
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="inline-flex items-center bg-indigo-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all border border-indigo-700"
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link 
+                  href="/auction/create" 
+                  className="inline-flex items-center bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Create New Auction
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                </Link>
+                <Link 
+                  href="/auctions" 
+                  className="inline-flex items-center bg-indigo-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all border border-indigo-700"
+                >
+                  Browse Auctions
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -87,29 +104,56 @@ const Page = () => {
       <section className="py-20 bg-indigo-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
         <div className="max-w-4xl mx-auto text-center px-4 relative z-10">
-          <h2 className="text-4xl font-bold mb-6 text-white">Ready to Start?</h2>
-          <p className="text-xl text-indigo-100 mb-10">Join thousands of users who trust Auctify for their online auctions.</p>
+          <h2 className="text-4xl font-bold mb-6 text-white">
+            {session?.user ? "Ready to Start Bidding?" : "Ready to Join?"}
+          </h2>
+          <p className="text-xl text-indigo-100 mb-10">
+            {session?.user 
+              ? "Browse through our latest auctions and find your next treasure."
+              : "Join thousands of users who trust Auctify for their online auctions."
+            }
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link 
-              href="/auction/create" 
-              className="inline-flex items-center bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
-            >
-              Create Your First Auction
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-              </svg>
-            </Link>
-            <Link 
-              href="/auctions" 
-              className="inline-flex items-center bg-indigo-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all border border-indigo-700"
-            >
-              Browse Auctions
-            </Link>
+            {session?.user ? (
+              <>
+                <Link 
+                  href="/auction/create" 
+                  className="inline-flex items-center bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Create New Auction
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                </Link>
+                <Link 
+                  href="/auctions" 
+                  className="inline-flex items-center bg-indigo-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all border border-indigo-700"
+                >
+                  Browse Auctions
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link 
+                  href="/signup" 
+                  className="inline-flex items-center bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Create Your Account
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                  </svg>
+                </Link>
+                <Link 
+                  href="/login" 
+                  className="inline-flex items-center bg-indigo-800 text-white px-8 py-3 rounded-full font-semibold hover:bg-indigo-700 transition-all border border-indigo-700"
+                >
+                  Sign In
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
     </div>
   );
-};
-
-export default Page;
+}
