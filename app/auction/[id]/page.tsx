@@ -186,7 +186,7 @@ export default async function AuctionPage({ params }: PageProps) {
                             min={auction.currentPrice + 0.01}
                             step="0.01"
                             required
-                            className="block w-full rounded-md border-gray-300 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            className="block w-full rounded-md text-indigo-600 border-gray-300 pl-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             placeholder="0.00"
                           />
                         </div>
