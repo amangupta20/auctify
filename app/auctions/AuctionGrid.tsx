@@ -23,45 +23,63 @@ export default function AuctionGrid({ initialAuctions }: { initialAuctions: Auct
   const [auctions, setAuctions] = useState<Auction[]>(initialAuctions);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const router = useRouter();
+
+  const fetchAuctions = async (retryAttempt = 0) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+      const response = await fetch('/api/auctions', {
+        cache: 'no-store',
+        next: { revalidate: 0 },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) throw new Error('Failed to fetch auctions');
+      
+      const data = await response.json();
+      if (!data.auctions) throw new Error('Invalid response format');
+      
+      setAuctions(data.auctions);
+      setRetryCount(0); // Reset retry count on success
+      
+    } catch (error) {
+      console.error('Error fetching auctions:', error);
+      
+      if (retryAttempt < 3) { // Retry up to 3 times
+        setRetryCount(retryAttempt + 1);
+        setTimeout(() => fetchAuctions(retryAttempt + 1), 1000 * (retryAttempt + 1)); // Exponential backoff
+      } else {
+        setError('Unable to load auctions. Please refresh the page.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
     let lastUpdate = Date.now();
+    let timeoutId: NodeJS.Timeout;
 
     const updateAuctions = async () => {
-      // Don't update if we've updated in the last 15 seconds
       if (Date.now() - lastUpdate < 15000) return;
-
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await fetch('/api/auctions', {
-          cache: 'no-store',
-          next: { revalidate: 0 }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch auctions');
-        
-        const data = await response.json();
-        if (isMounted) {
-          setAuctions(data);
-          lastUpdate = Date.now();
-        }
-      } catch (error) {
-        if (isMounted) {
-          setError(error instanceof Error ? error.message : 'Failed to update auctions');
-          console.error('Error fetching auctions:', error);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+      
+      if (isMounted) {
+        await fetchAuctions();
+        lastUpdate = Date.now();
       }
     };
 
-    // Initial update
-    updateAuctions();
+    // Initial update after 15 seconds
+    timeoutId = setTimeout(updateAuctions, 15000);
 
     // Set up polling interval (every 15 seconds)
     const interval = setInterval(updateAuctions, 15000);
@@ -70,13 +88,25 @@ export default function AuctionGrid({ initialAuctions }: { initialAuctions: Auct
     return () => {
       isMounted = false;
       clearInterval(interval);
+      clearTimeout(timeoutId);
     };
   }, []);
+
+  const handleRetry = () => {
+    setRetryCount(0);
+    fetchAuctions();
+  };
 
   if (error) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-600">Error: {error}</p>
+        <p className="text-red-600 mb-4">Error: {error}</p>
+        <button
+          onClick={handleRetry}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -103,7 +133,7 @@ export default function AuctionGrid({ initialAuctions }: { initialAuctions: Auct
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Updating...
+            {retryCount > 0 ? `Retrying (${retryCount}/3)...` : 'Updating...'}
           </div>
         </div>
       )}
@@ -114,6 +144,7 @@ export default function AuctionGrid({ initialAuctions }: { initialAuctions: Auct
             key={auction.id} 
             href={`/auction/${auction.id}`}
             className="group"
+            prefetch={false}
           >
             <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
               {/* Image */}
@@ -124,6 +155,8 @@ export default function AuctionGrid({ initialAuctions }: { initialAuctions: Auct
                     alt={auction.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-200"
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">

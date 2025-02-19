@@ -1,7 +1,7 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
 import AuctionGrid from './AuctionGrid';
-import { headers } from 'next/headers';
+import ErrorDisplay from './ErrorDisplay';
 
 export const metadata = {
   title: 'Browse Auctions | Auctify',
@@ -31,11 +31,6 @@ export default async function AuctionsPage() {
       },
     });
 
-    // Set response headers for better connection handling
-    const headersList = headers();
-    headersList.set('Cache-Control', 'no-store, must-revalidate');
-    headersList.set('Connection', 'keep-alive');
-
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,24 +57,7 @@ export default async function AuctionsPage() {
     );
   } catch (error) {
     console.error('Error loading auctions page:', error);
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Unable to load auctions
-          </h2>
-          <p className="text-gray-600 mb-8">
-            Please try refreshing the page
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            Refresh Page
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorDisplay />;
   } finally {
     await prisma.$disconnect();
   }

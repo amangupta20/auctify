@@ -14,41 +14,40 @@ export const metadata = {
 async function createAuction(formData: FormData) {
   'use server';
   
-  const session = await auth();
-  if (!session?.user) {
-    redirect('/login');
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email! }
-  });
-
-  if (!user) {
-    redirect('/login');
-  }
-
-  const title = formData.get('title') as string;
-  const description = formData.get('description') as string;
-  const startPrice = parseFloat(formData.get('startPrice') as string);
-  const category = formData.get('category') as string;
-  const condition = formData.get('condition') as string;
-  const endDate = new Date(formData.get('endDate') as string);
-  const imageFile = formData.get('image') as File;
-
-  let imageData: Buffer | null = null;
-  let imageType: string | null = null;
-  
-  if (imageFile) {
-    try {
-      imageData = Buffer.from(await imageFile.arrayBuffer());
-      imageType = imageFile.type;
-    } catch (error) {
-      console.error('Failed to process image:', error);
-      // Continue without image if processing fails
-    }
-  }
-
   try {
+    const session = await auth();
+    if (!session?.user) {
+      redirect('/login');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email! }
+    });
+
+    if (!user) {
+      redirect('/login');
+    }
+
+    const title = formData.get('title') as string;
+    const description = formData.get('description') as string;
+    const startPrice = parseFloat(formData.get('startPrice') as string);
+    const category = formData.get('category') as string;
+    const condition = formData.get('condition') as string;
+    const endDate = new Date(formData.get('endDate') as string);
+    const imageFile = formData.get('image') as File | null;
+
+    let imageData: Buffer | null = null;
+    let imageType: string | null = null;
+    
+    if (imageFile && imageFile.size > 0) {
+      try {
+        imageData = Buffer.from(await imageFile.arrayBuffer());
+        imageType = imageFile.type;
+      } catch (error) {
+        console.error('Failed to process image:', error);
+      }
+    }
+
     const auction = await prisma.auction.create({
       data: {
         title,
@@ -58,17 +57,18 @@ async function createAuction(formData: FormData) {
         category,
         condition,
         endDate,
-        imageData,
-        imageType,
+        imageData: imageData || undefined,
+        imageType: imageType || undefined,
         sellerId: user.id,
       },
     });
 
-    redirect(`/auction/${auction.id}`);
+    if (auction) {
+      redirect(`/auction/${auction.id}`);
+    }
   } catch (error) {
     console.error('Failed to create auction:', error);
-    // Handle error appropriately
-    return;
+    throw new Error('Failed to create auction');
   }
 }
 
