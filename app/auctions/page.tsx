@@ -103,10 +103,10 @@ export default async function AuctionsPage() {
                     </div>
 
                     <div className="mt-2 flex items-center space-x-2">
-                      <span className="px-2 py-1 text-xs font-medium bg-gray-100 rounded-full">
+                      <span className="px-2 py-1 text-indigo-600 text-xs font-medium bg-gray-100 rounded-full">
                         {auction.category}
                       </span>
-                      <span className="px-2 py-1 text-xs font-medium bg-gray-100 rounded-full">
+                      <span className="px-2 py-1 text-xs text-indigo-600 font-medium bg-gray-100 rounded-full">
                         {auction.condition}
                       </span>
                     </div>

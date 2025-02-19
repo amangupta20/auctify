@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { auth, signIn } from "@/auth"
 import { redirect } from "next/navigation"
+import { AuthError } from 'next-auth';
 
 export default async function LoginPage({
   searchParams,
@@ -13,12 +14,41 @@ export default async function LoginPage({
     redirect("/");
   }
 
-  const error = searchParams?.error;
+  async function authenticate(formData: FormData) {
+    'use server';
+    
+    const email = formData.get("email");
+    const password = formData.get("password");
 
-  let errorMessage = '';
-  if (error === 'CredentialsSignin') {
-    errorMessage = 'Invalid email or password. Please try again.';
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
+      redirect('/login?error=InvalidCredentials');
+    }
+
+    try {
+      await signIn("credentials", {
+        email,
+        password,
+        redirect: true,
+        redirectTo: "/"
+      });
+    } catch (error) {
+      if (error instanceof AuthError) {
+        switch (error.type) {
+          case "CredentialsSignin":
+            redirect('/login?error=CredentialsSignin');
+          default:
+            redirect('/login?error=Default');
+        }
+      }
+      throw error;
+    }
   }
+
+  const errorMessages = {
+    CredentialsSignin: 'Invalid email or password',
+    InvalidCredentials: 'Please provide valid credentials',
+    Default: 'An error occurred during sign in'
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -32,23 +62,7 @@ export default async function LoginPage({
             </Link>
           </p>
         </div>
-        <form className="mt-8 space-y-6" action={async (formData: FormData) => {
-          "use server";
-          
-          const email = formData.get("email");
-          const password = formData.get("password");
-
-          if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
-            return;
-          }
-
-          await signIn("credentials", {
-            email,
-            password,
-            redirectTo: "/",
-            redirect: true,
-          });
-        }}>
+        <form className="mt-8 space-y-6" action={authenticate}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">Email address</label>
@@ -76,7 +90,7 @@ export default async function LoginPage({
             </div>
           </div>
 
-          {errorMessage && (
+          {searchParams?.error && (
             <div className="rounded-md bg-red-50 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
@@ -86,7 +100,7 @@ export default async function LoginPage({
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-red-800">
-                    {errorMessage}
+                    {errorMessages[searchParams.error as keyof typeof errorMessages] || errorMessages.Default}
                   </p>
                 </div>
               </div>
@@ -102,13 +116,27 @@ export default async function LoginPage({
             </button>
           </div>
 
-          <div className="text-center">
-            <Link 
-              href="/forgot-password" 
-              className="text-sm text-indigo-600 hover:text-indigo-500"
-            >
-              Forgot your password?
-            </Link>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                Remember me
+              </label>
+            </div>
+
+            <div className="text-sm">
+              <Link 
+                href="/forgot-password" 
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                Forgot your password?
+              </Link>
+            </div>
           </div>
         </form>
       </div>
