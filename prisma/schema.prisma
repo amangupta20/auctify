@@ -47,6 +47,12 @@ model User {
   password      String?
   emailVerified DateTime?
   image         String?
+  phoneNumber   String?
+  address       String?
+  city          String?
+  state         String?
+  country       String?
+  bio           String?   @db.Text
   accounts      Account[]
   sessions      Session[]
 }
