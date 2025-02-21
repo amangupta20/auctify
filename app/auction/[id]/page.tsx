@@ -150,6 +150,7 @@ export default async function AuctionPage(props: PageProps) {
                       <span className="px-3 py-1 rounded-full text-indigo-600 text-xs font-medium bg-gray-100">
                         {auction.category}
                       </span>
+                      
                       <span className="px-3 py-1 rounded-full text-indigo-600 text-xs font-medium bg-gray-100">
                         {auction.condition}
                       </span>
