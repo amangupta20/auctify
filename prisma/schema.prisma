@@ -53,6 +53,7 @@ model User {
   state         String?
   country       String?
   bio           String?   @db.Text
+  balance       Float     @default(0.0)
   accounts      Account[]
   sessions      Session[]
   auctions      Auction[]
