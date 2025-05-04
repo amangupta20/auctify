@@ -15,14 +15,26 @@ export async function POST() {
           lt: new Date(), // endDate is less than current time
         },
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        imageData: true,
+        imageType: true,
         bids: {
           orderBy: {
-            amount: "desc", // Get highest bid first
+            amount: "desc",
           },
-          take: 1, // Only need the highest bid
-          include: {
-            bidder: true, // Include bidder details
+          take: 1,
+          select: {
+            amount: true,
+            bidder: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
           },
         },
       },
@@ -39,6 +51,15 @@ export async function POST() {
           // Prepare auction URL for email
           const auctionUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auction/${auction.id}`;
 
+          // Convert image data to base64 URL if available
+          let imageDataUrl;
+          if (auction.imageData && auction.imageType) {
+            const base64Image = Buffer.from(auction.imageData).toString(
+              "base64"
+            );
+            imageDataUrl = `data:${auction.imageType};base64,${base64Image}`;
+          }
+
           // Render email HTML
           const emailHtml = await renderAsync(
             InvoiceEmail({
@@ -47,6 +68,7 @@ export async function POST() {
               finalPrice: winningBid.amount,
               itemDescription: auction.description,
               auctionUrl,
+              imageDataUrl,
             })
           );
 

@@ -6,6 +6,7 @@ import {
   Text,
   Link,
   Hr,
+  Img,
 } from "@react-email/components";
 
 interface InvoiceEmailProps {
@@ -14,6 +15,7 @@ interface InvoiceEmailProps {
   finalPrice: number;
   itemDescription?: string;
   auctionUrl?: string;
+  imageDataUrl?: string;
 }
 
 export function InvoiceEmail({
@@ -22,6 +24,7 @@ export function InvoiceEmail({
   finalPrice,
   itemDescription,
   auctionUrl,
+  imageDataUrl,
 }: InvoiceEmailProps) {
   return (
     <Html>
@@ -33,6 +36,21 @@ export function InvoiceEmail({
             Congratulations! You&apos;ve won the auction for &quot;
             {auctionTitle}&quot; with a winning bid of ${finalPrice.toFixed(2)}.
           </Text>
+
+          {imageDataUrl && (
+            <Img
+              src={imageDataUrl}
+              alt={auctionTitle}
+              width="200"
+              height="200"
+              style={{
+                maxWidth: "200px",
+                height: "auto",
+                marginBottom: "20px",
+                marginTop: "10px",
+              }}
+            />
+          )}
 
           {itemDescription && (
             <Text>
