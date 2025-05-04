@@ -15,7 +15,7 @@ interface InvoiceEmailProps {
   finalPrice: number;
   itemDescription?: string;
   auctionUrl?: string;
-  imageDataUrl?: string;
+  imageUrl?: string; // Changed from imageDataUrl to imageUrl for public URL approach
 }
 
 export function InvoiceEmail({
@@ -24,7 +24,7 @@ export function InvoiceEmail({
   finalPrice,
   itemDescription,
   auctionUrl,
-  imageDataUrl,
+  imageUrl, // Changed from imageDataUrl to imageUrl
 }: InvoiceEmailProps) {
   return (
     <Html>
@@ -37,9 +37,9 @@ export function InvoiceEmail({
             {auctionTitle}&quot; with a winning bid of ${finalPrice.toFixed(2)}.
           </Text>
 
-          {imageDataUrl && (
+          {imageUrl && (
             <Img
-              src={imageDataUrl}
+              src={imageUrl}
               alt={auctionTitle}
               width="200"
               height="200"
@@ -69,10 +69,6 @@ export function InvoiceEmail({
               View auction details: <Link href={auctionUrl}>{auctionUrl}</Link>
             </Text>
           )}
-
-          <Text>
-            Please process your payment soon to complete the transaction.
-          </Text>
 
           <Text>Thank you for participating in our auction!</Text>
         </Container>

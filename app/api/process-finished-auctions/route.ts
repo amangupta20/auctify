@@ -51,14 +51,10 @@ export async function POST() {
           // Prepare auction URL for email
           const auctionUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auction/${auction.id}`;
 
-          // Convert image data to base64 URL if available
-          let imageDataUrl;
-          if (auction.imageData && auction.imageType) {
-            const base64Image = Buffer.from(auction.imageData).toString(
-              "base64"
-            );
-            imageDataUrl = `data:${auction.imageType};base64,${base64Image}`;
-          }
+          // Construct public image URL if auction has image data
+          const imageUrl = auction.imageData
+            ? `${process.env.NEXT_PUBLIC_APP_URL}/api/images/${auction.id}`
+            : undefined;
 
           // Render email HTML
           const emailHtml = await renderAsync(
@@ -68,7 +64,7 @@ export async function POST() {
               finalPrice: winningBid.amount,
               itemDescription: auction.description,
               auctionUrl,
-              imageDataUrl,
+              imageUrl, // Use public URL instead of base64 data
             })
           );
 
