@@ -70,7 +70,7 @@ export async function POST() {
 
           // Send invoice email
           await resend.emails.send({
-            from: "Auctify <auctions@resend.dev>", // Update with your verified domain
+            from: "Auctify <auctify@mail.homlab.me>", // Update with your verified domain
             to: winningBid.bidder.email || "",
             subject: `🎉 You won the auction: ${auction.title}`,
             html: emailHtml,
