@@ -1,8 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Auctify
+
+Auctify is a modern online auction platform built with Next.js, allowing users to create, bid on, and manage auctions.
+
+## Features
+
+- User Authentication (Sign up, Log in)
+- Create and manage auctions
+- View active auctions
+- Place bids on auctions
+- User profiles
+- Email notifications (e.g., for invoices)
+- Automated processing of finished auctions
+
+## Technologies Used
+
+- Next.js
+- React
+- TypeScript
+- Prisma (for database interaction)
+- NextAuth.js (for authentication)
+- Tailwind CSS (for styling)
+- Resend (for emails)
 
 ## Getting Started
 
-First, run the development server:
+Follow these steps to set up and run the project locally.
+
+### Prerequisites
+
+- Node.js (v18 or later)
+- npm or yarn or pnpm or bun
+- A database (e.g., PostgreSQL, MySQL) compatible with Prisma
+- Environment variables configured (database URL, NextAuth secret, Resend API key, etc.)
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone [repository_url]
+cd auctify
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+3. Set up your database and apply migrations:
+
+```bash
+npx prisma migrate dev --name initial_migration # Or the name of your first migration
+```
+
+4. Generate Prisma client:
+
+```bash
+npx prisma generate
+```
+
+### Running the Development Server
 
 ```bash
 npm run dev
