@@ -15,6 +15,7 @@ services:
     container_name: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${passwordmysqlroot}
+      - MYSQL_DATABASE=auctify
       - MYSQL_PASSWORD=${passwordmysql}
       - MYSQL_USER=${usermysql}
     volumes:
