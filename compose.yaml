@@ -12,7 +12,7 @@ services:
     depends_on:
       - db
   db:
-    image: mysql:8
+    image: docker.io/library/mysql:8
     container_name: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${passwordmysqlroot}
