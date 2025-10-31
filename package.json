@@ -9,10 +9,6 @@
     "lint": "next lint"
   },
   "packageManager": "npm@11.1.0",
-  "overrides": {
-    "react": "$react",
-    "react-dom": "$react"
-  },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
     "@prisma/client": "^6.3.1",
