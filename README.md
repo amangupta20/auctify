@@ -84,6 +84,86 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Docker Setup
+
+This project includes Docker configuration for easy deployment and development.
+
+### Prerequisites
+
+- Docker and Docker Compose installed
+- Environment variables configured
+
+### Quick Start with Docker
+
+1. **Set up environment variables:**
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your actual values:
+```env
+# Database credentials
+usermysql=user
+passwordmysql=password123
+passwordmysqlroot=rootpassword123
+
+# NextAuth secret (generate with: openssl rand -base64 32)
+NEXTAUTH_SECRET=your-nextauth-secret-here
+
+# Resend API key for emails
+RESEND_API_KEY=your-resend-api-key-here
+```
+
+2. **Build and run with Docker Compose:**
+
+```bash
+docker-compose up --build
+```
+
+This will:
+- Build the Next.js application
+- Start MySQL database
+- Set up database with migrations
+- Run the application on http://localhost:3000
+
+### Docker Services
+
+- **main_app**: Next.js application (port 3000)
+- **db**: MySQL 8 database (internal network only)
+- **auctify_net**: Internal Docker network for service communication
+
+### Environment Variables
+
+The application uses these environment variables:
+- `DATABASE_URL`: MySQL connection string
+- `NEXTAUTH_SECRET`: Secret for NextAuth.js authentication
+- `RESEND_API_KEY`: API key for email sending
+
+### Development vs Production
+
+- **Development**: Use `npm run dev` for local development with hot reload
+- **Production**: Docker setup uses `npm run build` and `npm start` for optimized production build
+
+### Database Migrations
+
+When running with Docker, the database is automatically created. To run migrations manually:
+
+```bash
+docker-compose exec main_app npx prisma migrate deploy
+```
+
+### Stopping Services
+
+```bash
+docker-compose down
+```
+
+To remove database data:
+```bash
+docker-compose down -v
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
