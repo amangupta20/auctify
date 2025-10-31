@@ -6,6 +6,7 @@ services:
     environment:
       - DATABASE_URL=mysql://${usermysql}:${passwordmysql}@db:3306/auctify
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - RESEND_API_KEY=${RESEND_API_KEY}
     networks:
       - auctify_net
     depends_on:
