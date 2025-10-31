@@ -1,0 +1,27 @@
+services:
+  main_app:
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - DATABASE_URL=mysql://${usermysql}:${passwordmysql}@db:3306/auctify
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+    networks:
+      - auctify_net
+    depends_on:
+      - db
+  db:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${passwordmysqlroot}
+      - MYSQL_PASSWORD=${passwordmysql}
+      - MYSQL_USER=${usermysql}
+    volumes:
+      - mysqldata:/var/lib/mysql
+    networks:
+      - auctify_net
+networks:
+  auctify_net:
+volumes:
+  mysqldata:
